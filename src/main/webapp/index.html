@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Blog - All Posts</title>
+</head>
+<body>
+<div class="container">
+    <h1>All Blog Posts</h1>
+    <div class="row">
+        <c:forEach var="post" items="${posts}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${post.title}</h5>
+                    <p class="card-text">${post.content.substring(0, 100)}...</p>
+                    <a href="/post?id=${post.id}" class="btn">Read More</a>
+                </div>
+            </div>
+        </c:forEach>
+    </div>
+    <a href="create-post.html" class="btn btn-success">Create New Post</a>
+</div>
+</body>
+</html>
