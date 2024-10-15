@@ -15,11 +15,12 @@ import java.sql.SQLException;
 
 public class CreatePostServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/create.jsp").forward(request, response);
     }
 
-
+@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String title = request.getParameter("title");
         String content = request.getParameter("content");

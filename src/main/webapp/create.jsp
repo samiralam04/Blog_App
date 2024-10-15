@@ -10,7 +10,7 @@
 <body>
 <div class="container">
     <h1 class="mt-4">Create Blog Post</h1>
-    <form action="/create" method="post">
+    <form action="/Blog_App/create" method="post">
 
         <div class="form-group">
             <label for="title">Title</label>
