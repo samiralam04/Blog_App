@@ -6,40 +6,76 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/blog")
 public class BlogServlet extends HttpServlet {
 
-    @Override
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Retrieve all posts from the database using PostDAO
-        List<Post> posts = PostDAO.getAllPosts();
+        String id = request.getParameter("id");
 
-        // Check if posts exist
-        if (posts == null || posts.isEmpty()) {
-            request.setAttribute("message", "No posts available.");
+        if (id != null && !id.isEmpty()) {
+            // Fetch and display a single blog post by ID
+            viewSinglePost(request, response, id);
         } else {
-            request.setAttribute("posts", posts);
+            // Fetch and display all blog posts
+            viewAllPosts(request, response);
         }
-
-        // Forward the request to a JSP page to display posts dynamically
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Retrieve title and content from the form
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
+    // Method to view a single post
+    private void viewSinglePost(HttpServletRequest request, HttpServletResponse response, String id) throws ServletException, IOException {
+        BlogPost post = null;
 
-        // Create a new Post object with the provided title and content
-        Post post = new Post(title, content);
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            String query = "SELECT * FROM posts WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Integer.parseInt(id));
+            ResultSet resultSet = statement.executeQuery();
 
-        // Save the post to the database using PostDAO
-        PostDAO.savePost(post);
+            if (resultSet.next()) {
+                post = new BlogPost(
+                        resultSet.getInt("id"),
+                        resultSet.getString("title"),
+                        resultSet.getString("content")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        // Redirect to the /blog page to show the updated list of posts
-        response.sendRedirect("/blog");
+        if (post != null) {
+            request.setAttribute("post", post);
+            request.getRequestDispatcher("/view.jsp").forward(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Blog post not found");
+        }
+    }
+
+    // Method to view all posts
+    private void viewAllPosts(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<BlogPost> blogPosts = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            String query = "SELECT * FROM posts";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                BlogPost post = new BlogPost(
+                        resultSet.getInt("id"),
+                        resultSet.getString("title"),
+                        resultSet.getString("content")
+                );
+                blogPosts.add(post);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        request.setAttribute("posts", blogPosts);
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
     }
 }
