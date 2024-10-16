@@ -3,7 +3,6 @@ package com.servlets.Blog_App;
 
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +34,6 @@ public class CreatePostServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        response.sendRedirect("/blogs");
+        response.sendRedirect("/Blog_App/blogs");
     }
 }
